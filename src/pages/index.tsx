@@ -1,7 +1,7 @@
 import { SWRConfig } from 'swr';
 import PostsList from '@/components/PostsList';
 
-export default function Posts({ fallback }) {
+export default function Posts({ fallback }: any) {
   return (
     <SWRConfig value={{fallback}}>
       <PostsList />

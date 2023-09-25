@@ -10,6 +10,7 @@ function getKey(pageIndex: number, previousPageData: any) {
 
 function PostsList() {
   const [posts, setPosts] = React.useState([]);
+  const { cache } = useSWRConfig();
   const { data, size, setSize, isLoading } = useSWRInfinite(getKey, async (url: string) => {
     const params = new URLSearchParams(url);
       const page = params.get('page'); 
@@ -23,10 +24,13 @@ function PostsList() {
   useEffect(() => {
     if (data) {
       const list = data.flat();
-      setPosts(list);
+      setPosts(list as any);
     }
   }, [data])
-  
+
+  useEffect(() => {
+    console.log('cache swr', cache);
+  }, [cache])
   return (
     <div>
       <h1>SWR Infinite</h1>
@@ -37,7 +41,7 @@ function PostsList() {
       </div>
       <br />
       <ol>
-        {posts.map((post) => (
+        {posts.map((post: any) => (
             <li key={post.id}>{post.title}</li>
         ))}
       </ol>
