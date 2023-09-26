@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSWRConfig } from 'swr';
 import useSWRInfinite from 'swr/infinite';
 
@@ -10,16 +10,18 @@ function getKey(pageIndex: number, previousPageData: any) {
 
 function PostsList() {
   const [posts, setPosts] = React.useState([]);
+  const [parallelFetchEnable, setParallelFetchEnable] = useState(false);
   const { cache } = useSWRConfig();
-  const { data, size, setSize, isLoading } = useSWRInfinite(getKey, async (url: string) => {
+  const { data, size, setSize, isLoading } = useSWRInfinite(getKey, (url: string) => {
     const params = new URLSearchParams(url);
       const page = params.get('page'); 
-    return await fetch(`https://jsonplaceholder.typicode.com/posts/${page}`).then((res) => res.json()).then(data => [data]);
+    return fetch(`https://jsonplaceholder.typicode.com/posts/${page}`).then((res) => res.json()).then(data => [data]);
   }, {
     revalidateIfStale: false,
     revalidateFirstPage: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
+    parallel: parallelFetchEnable,
   });
   useEffect(() => {
     if (data) {
@@ -36,6 +38,7 @@ function PostsList() {
       <h1>SWR Infinite</h1>
       <span>Current Page - {size}</span>
       <div>SWR Loading State: {isLoading ? 'true' : 'false'}</div>
+      <div>Enable Parallel Fetch: <input type="checkbox" onChange={(e) => setParallelFetchEnable(e.target.checked)} /></div>
       <div>
         <button onClick={() => setSize((size: number) => (size + 1))}>next</button>
       </div>
